@@ -1,0 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Nasal - Not another scripting language</title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="nasal.css">
+</head>
+<body>
+
+<h1>Nasal: Not another scripting language!</h1>
+<h2>Design Philosophy</h2>
+Performance is not a design goal.  Nasal isn't especially slow.  Early
+benchmarks of the garbage collector showed it as faster than perl's
+reference counter, and its number crunching performance is on par with
+python.  But in all cases, simplicity, transparency and a sane feature
+set are preferred over speed.
+<p>
+World domination is not a design goal.  Nasal is designed for use as an
+extension language in an larger project.  The problem with many
+otherwise excellent languages in this environment is that they are
+huge.  Perl and python are great, but enormous.  Even their "core"
+interpreters and library code are larger than most projects that
+require an embedded language.  They cannot be readily shipped with
+their host application and need to be installed system-wide.  This is
+a pain and a compatibility hassle.
+<p>
+Conversely, neither is minimalism a design goal.  The chief problem
+with "small" scripting languages (scheme, lua, tcl) is that they tend
+to support only a minimal set of features that the author found
+useful.  While these languages are provably sufficient to support
+their intended usage, they make for tedious and unproductive
+development environments.  Except for the select few to whom they
+appeal, these languages aren't "fun."
+<p>
+The real goal with Nasal is to have a language that supports most
+"normal" programming idioms (objects, functions, arrays, hashes) while
+avoiding the bloat that comes from "platform" scripting languages like
+perl, python, ruby and php.
+
+
+<h2>Syntax & Programming</h2>
+Like perl, python and javascript, nasal uses vectors (expandable
+arrays) and hash tables as its native data format.  This is a
+well-understood idiom, and it works very well.  I felt no need to rock
+the boat here.
+<p>
+Like perl, and unlike everything else, nasal combines numbers and
+strings into a single "scalar" datatype.  No conversion needs to
+happen in user code, which simplifies common string handling tasks.
+<p>
+Like perl, but unlike python, hash keys must by scalars in nasal.
+Python supports a "tuple" constant type that can be used as well, but
+there is no equivalent in nasal (you can't use vectors as keys because
+they might change after the insertion).
+<p>
+Like perl and python, nasal uses a # character to indicate and
+end-of-line comment.  There is no multiline begin/end comment syntax
+as in Javascript.
+<p>
+Like perl, nasal functions need not have named parameters (although
+named arguments are supported as a syntactic convenience).  They get
+their arguments in a vector named "arg", and can extract them however
+they like.  This allows the function to implement variant calling
+conventions (e.g. "overloading") on its own terms.  Unlike perl, Nasal
+takes advantage of this feature to do away with function "declaration"
+entirly; see below.
+<p>
+Like python, there is no hidden local object scope in a function call.
+The object on which a method was called is available to a function as
+a local variable named "me" (python calls this "self" by convention,
+but in nasal it is fixed -- there is no opportunity to change it).
+<p>
+Like perl, "objects" in nasal are simply hash tables.  Looking an item
+up by name in a hash table and extracting a symbol for an object are
+just different syntax for the same operation (but read on for an
+important exception):
+<p>
+   <code> a["b"] = 1 </code> means the same thing as: <code> a.b = 1 </code>
+<p>
+The above paragraph is a minor lie.  The "dot" syntax is also the clue
+to the interpreter to "save" the left hand side as the "me" reference
+if the expression is used as a function/method call.  That is, these
+expressions are <b>not</b> equivalent (one is a plain function call, the
+other a method invocation on the object "a"):
+<p>
+     <code> a["b"](arg1, arg2) </code> isn't the same as:
+     <code> a.b(arg1, arg2) </code>
+<p>
+Like javascript, nasal lacks a specific "class" syntax for OOP
+programming.  Instead, classes are simply objects.  Each object
+supports a "parents" member array; symbol lookup on the object at
+runtime bounces to the parents (and the parents' parents) if the
+symbol is not found in the hash.  The parents field is just like any
+other object field, you can set it however you like and even change it
+at runtime if you are feeling especially perverse.
+<p>
+Like lisp, javascript and perl, nasal supports lexical closures.  This
+means that the local symbol namespace available to your function when
+it is assigned remain constant over time.  If you don't know what this
+means, you don't need to care.  It is this feature that allows
+functions to use variables declared in the outer scope when it is
+defined (e.g. seeing "module" variables).
+<p>
+Unlike many other languages, however, the symbol lookup namespace in
+Nasal is always a function call.  Most languages allow variables
+declared within "inner" code blocks to "hide" variables of the same
+name set at a higher level.  In Nasal, all uses of a given symbol name
+within a single function refer to the same symbol, always.  This can
+occasionally be surprising to new programmers:
+<pre>
+if(1) {
+    var i=1234;
+    for(var i=0; i<10; i+=1) {}
+    print(i); # i==10 here, not 1234!
+}
+</pre>
+<p>
+Like all other scripting languages, functions are just symbols in a
+namespace, but unlike all other scripting languages, there is no
+function "declaration" syntax.  A function is always an anonymous
+object (a "lambda," in the parlance), which you assign to a variable in
+order to use.  Like so:
+<p>
+<pre>
+myfunction = func(x) { x + 1 }
+myfunction(1); # returns 2
+</pre>
+<p>
+One annoyance of this feature is that Nasal functions don't have
+unique internal "names".  So a debugging or exception stack trace can
+only give you a source file and line number, and not a function name
+as reference.
+<p>
+Nasal has a straightforward, readable syntax which is closest to
+javascript among other scripting languages.  Like later versions of
+javascript, it includes has a hash lookup syntax as well as an object
+field accessor syntax (that is, you can do both <code>a.b</code> and
+<code>a["b"]</code>).
+<p>
+Unlike python, nasal has a grammar which is not whitespace-sensitive.
+This doesn't make python hard to write, and it arguably makes it
+easier to read.  But it is different from the way the rest of the
+world works, and makes python distinctly unsuitable for "inline"
+environments (consider PHP, Javascript, ASP or in-configuration-file
+scripts) where it needs to live as a plain old string inside of
+another program's code or data file.
+<p>
+Nasal tries to be stricter than perl.  Operations like converting a
+non-numeric string value to a number, reading or writing past the end
+of an array or operating on a nil reference, which are generally legal
+in perl, throw exceptions in nasal.  Perl sometimes bends over
+backwards to do something "reasonable" with your instructions
+(e.g. what's the boolean truth value of a hash reference?); nasal
+doesn't try ("error: non-scalar used in boolean context at line 92")
+
+<h2>Architecture</h2>
+<p>
+Unlike almost all other script interpreters, Nasal is threadsafe and
+scalable when called from multiple CPU threads (as opposed to the
+userspace interpreter threads implemented by Ruby).  No special
+treatment is required (as for perl, which clones a separate
+interpreter with separate data for each thread and uses locking around
+specifically-designated shared data) and the threads can be scheduled
+simultaneously.  There is no global lock on the interpreter, as used
+by Python or Lua.  The only limit on scalability is garbage
+collection, which must block all interpreter threads before running.
+<p>
+When running threaded code, Nasal provides "minimal threadsafety",
+meaning that the interpreter itself can be safely called from multiple
+CPU threads without risk of corrupting or deadlocking the interpreter
+internals.  Multithreaded operations are therefore "safe", although
+they are not guaranteed to be atomic.  In particular, poorly
+synchronized insertions into containers can "drop" objects into
+oblivion (which is OK from an interpreter stability standpoint, since
+the GC will clean them up normally).  Nasal itself provides no
+synchronization primitives to address this; thread architecture is a
+"top-level" design job, and Nasal is intended to be an extension
+language in a larger project.  Choice of synchronization mechanisms is
+going to be highly application dependent.
+<p>
+Nasal garbage collects runtime storage, so the programmer need not
+worry about manual allocation, or even circular references.  The
+current implementation is a simple mark/sweep collector, which should
+be acceptable for most applications.  Future enhancements will include
+a "return early" capability for latency-critical applications.  The
+collector can be instructed to return after a certain maximum delay,
+and be restarted later.  Fancy items like generational collectors fail
+the "small and simple" criteria and are not likely to be included.
+<p>
+Like python, nasal supports exception handling as a first-class
+language feature, with built-in runtime-inspectable stack trace.
+Rather like perl, however, there is no special "try" syntax for
+exception handling, nor inheritance-based catching semantics.
+Instead, you use the <code>call()</code> builtin to invoke a function
+object and inspect the results to determine what error was thrown
+(either with the <code>die()</code> builtin or via an internal runtime
+error) and what the stack trace looked like.  Elaborate exception
+handling isn't really appropriate for embedded scripting languages.
+<p>
+Nasal's interpreter is small, comparatively simple, written in ANSI C,
+and generally an excellent choice for embedded applications.  It uses
+a simple and transparent syntax interpretable by a simple "bracket
+matching and operator precedence" parser.  It does not depend on any
+third party libraries other than the standard C library.  It does not
+depend on third party tools like (f)lex and yacc/bison.  It builds
+simply and easily, supports a reasonably simple extension API and
+cohabitates well with other code.
+<p>
+Nasal makes no use of the processor stack when running recursive code.
+This is important for embedded languages as it provides the ability to
+"exit early" from a Nasal context.  An outside application may have
+realtime constraints, and Nasal can be instructed to run for only a
+certain number of "cycles" before returning.  Later calls will
+automatically pick up the interpreter state where it left off.
+
+</body>
+</html>

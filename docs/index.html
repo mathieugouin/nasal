@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Nasal - Not another scripting language</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="nasal.css">
+</head>
+<body>
+
+<h1>Nasal: Not another scripting language!</h1>
+
+<h2>Quick Links</h2>
+<ul>
+ <li><a href="doc.html">Design Document</a>
+ <li><a href="sample.nas">Sample Code Tutorial</a>
+ <li><a href="lib.html">Library Documentation</a>
+ <li><a href="nasal-1.0.1.tar.gz">Download Nasal 1.0.1</a>
+ <li><a href="/cgi-bin/mailman/listinfo/nasal">Mailing List</a>
+ <li><a href="flightgear.html">FlightGear Integration</a>
+</ul>
+
+<h2>Executive summary:</h2>
+<ul>
+ <li>Vectors, Hashes and Scalars (number/strings)
+ <li>"Normal" OOP syntax
+ <li>Small!  146k source code. Easily embeddable and extensible
+ <li>Functional programming
+ <li>Garbage collected
+ <li>Threadsafe
+</ul>
+
+<p>Nasal is a language that I wrote for use in a personal project.
+Ostensibly it was because I was frustrated with the dearth of
+small-but-complete embeddable scripting languages, but of course I
+really wrote it because it was fun.  It is still young and incomplete
+in a few places, but is under active development and has been
+integrated as the extension language for the <a
+href="http://www.flightgear.org">FlightGear</a> simulator.
+<p>
+Documentation is still sparse.  There is a <a href="doc.html">design
+document</a> available, which talks at length about the "why's" behind
+the design of Nasal and includes documentation for the built-in
+library functions.  More useful to the experienced programmer is the
+tutorial-style <a href="sample.nas">sample code</a>, which explains
+and demonstrates all the syntax features of the language.
+<p>
+Source code is available under the terms of the <a
+href="http://www.gnu.org/licenses/licenses.html">GNU LGPL</a>.
+<p>
+Questions and comments can go to the author,
+<a href="mailto:andy@plausible.org">Andy Ross</a>, via email at <a href="mailto:andy@plausible.org">andy@plausible.org</a>.
+
+<h2>Getting Nasal</h2>
+
+<p>
+The most source code recent release
+is <a href="nasal-1.0.1.tar.gz">Nasal 1.0.1</a> and can be downloaded
+here.
+<p>
+The CVS development tree is also available on plausible.org via
+anonymous pserver access.  Check out using:
+
+<pre>cvs -d :pserver:cvs@plausible.org:/home/nasal-cvs co nasal</pre>
+
+Checkins to the archive are logged to the
+<a href="http://plausible.org/pipermail/nasal-cvs/">nasal-cvs@plausible.org</a>
+mailing list.
+
+There is also a
+<a href="http://www.freebsd.org/projects/cvsweb.html">cvsweb</a> interface
+available at:
+<a href="http://plausible.org/cgi-bin/cvsweb.cgi">http://plausible.org/cgi-bin/cvsweb.cgi</a>
+for online browsing.
+<p>
+Those interested in the development version should consider
+subscribing to the <a href="/cgi-bin/mailman/listinfo/nasal">Nasal
+mailing list</a>.  Nasal's documentation is still very limited, and
+this is the best forum for getting help and making suggestions.
+
+<h2>News and Updates</h2>
+
+<h3>05 Jul 2006</h3>
+
+<p>A <a href="/cgi-bin/mailman/listinfo/nasal">mailing list</a> is now
+  available for Nasal discussions.  I have fielded enough similar
+  questions and suggestions from different authors that a public forum
+  seems to be a good idea.  Traffic is likely to be very low, but
+  hopefully having the archives available will be a cheap way to to
+  improve the state of Nasal documentation.
+
+<h3>04 Jul 2006</h3>
+
+<p>Oops.  Nasal 1.0, which fixed a long standing bug with
+break/continue inside foreach/forindex and a continue issue when used
+with multi-level labels, introduced a nasty regression with the
+regular old break statement.  A mark stack underflow would result and
+cause a runtime error when used in large or deep loops.  A
+new <a href="nasal-1.0.1.tar.gz">1.0.1 release</a> is available with a
+fix for this problem.
+
+<h3>03 Jul 2006</h3>
+
+<p>I finally bothered to put together a new release, containing the
+  updates that have been available in SimGear for some time now.
+  <a href="nasal-1.0.tar.gz">Nasal 1.0 is now available for
+  download</a>.  Important new functionality includes bugfixes, many
+  performance enhancements, declared function argument syntax, a
+  ternary (?:) operator, indexable and mutable string objects,
+  interpreter threadsafety features, and much work to the "standard"
+  library (including stdio, bitfields, unix system calls and PCRE
+  regular expresions).
+
+<h3>07 Dec 2004</h3>
+
+<p><a href="nasal-0.9.2.tar.gz">Nasal 0.9.2</a> has been released.
+This version adds support for multiple context objects, and uses the
+new feature to implement <code>call()</code> and <code>eval()</code>
+library routines.
+
+<h3>25 Jun 2004</h3>
+
+<p>A <a href="http://plausible.org/nasal/nasal-0.9.1.tar.gz">new
+release</a>, 0.9.1 is available.  This fixes minor bugs, and changes the C
+extension API to allow the called function to tell whether it was
+called as an object method.  Download load it from
+<a href="http://plausible.org/nasal/nasal-0.9.1.tar.gz">
+http://plausible.org/nasal/nasal-0.9.1.tar.gz</a>.
+
+<h3>27 Feb 2004</h3>
+
+<p>Manabu Nishiyama is working on a SWIG module to generate Nasal
+extension code.  Check it out at
+<a href="http://balder.prohosting.com/~alteisen/swignasal/index.html">
+http://balder.prohosting.com/~alteisen/swignasal/index.html</a>
+
+<h3>15 Feb 2004</h3>
+
+<p>Updated <a href="nasal.vim">nasal.vim</a> syntax highlighting file from Melchior FRANZ.
+
+<h3>04 Dec 2003</h3>
+
+<p>Nasal has its first customer!  The <a
+href="http://www.flightgear.org">FlightGear</a> project is now using
+Nasal as its embedded scripting language.  Nasal itself is now
+available as part of the <a href="http://www.simgear.org">SimGear</a>
+package which provides utility code for the core simulator.
+Development is progressing rapidly, and SimGear is likely to be the
+best place to find cutting edge Nasal code in the near-term future.
+This site will continue to provide packaged code only occasionally.
+Check out FlightGear, even if you aren't interested in flight
+simulation.  The Nasal integration there is large and elaborate, and
+makes an excellent case study for the Nasal extension API.  It
+includes a large <a href="flightgear.html">FlightGear/Nasal
+integration document</a>, as well.
+
+<p><i>(Conversely, check out FlightGear even if you aren't interested
+in Nasal! It's a great project.)</i>
+
+<p>I've packaged up a <a href="nasal-0.9.tar.gz">0.9 release</a> to
+match the current version in FlightGear.  It contains lots of bug
+fixes; significant new features like a math library, stack trace
+support for error handling, and a "ghost" mechanism for wrapping
+pointers to C objects in a garbage-collector-friendly way; and some
+fun toys like a <a href="nasal.vim">Vim syntax highlighting</a> file
+(contributed by Melchior FRANZ) to go with the <a
+href="nasal-mode.el">Emacs mode</a> I hacked together.  See the
+<a href="ChangeLog">ChangeLog</a> file for more complete information.
+
+<h3>29 Nov 2003</h3>
+
+<p>The new 2.0-13 version of <a
+href="http://freshmeat.net/projects/highlight/">Highlight</a>, André
+Simons's multi-language, multi-format, multi-theme code formatter and
+pretty printer supports Nasal!
+
+<h3>23 Sep 2003</h3>
+
+Another <a href="nasal-0.2.2.tar.gz">release</a> is available for
+public consumption.  This fixes several bugs, including crashing
+issues with the garbage collector and bytecode interpreter.
+
+<p>Also note that the name has been officially (if unimaginatively)
+changed from "Nasl" to "Nasal" to avoid collision with the nice folks
+at Nessus.  I'm still open to better names.  I picked this one because
+it allowed me to avoid changing the pronunciation or naXXX C symbol
+prefix.
+
+<h3>18 Feb 2003</h3>
+It has been brought to my attention that I have stepped on someone
+else's name.  The <a href="http://www.nessus.org/">Nessus Project</a>
+has already christened their extension language "NASL".  Oops.
+Unfortunately, I currently lack the time or creativity to come up with
+something better.  This will stay "Nasl" for now (different
+capitalization, different acronymoid), but I promise to come up with
+something less ambiguous before the next major release, if there is
+one.  Suggestions are welcome.
+<p>
+There is a new <a href="nasl-0.2.1.tar.gz">package file</a>, with some
+garbage collection performance/determinism improvements and two new
+sample scripts to test/benchmark <a href="gcperf.nas">garbage
+collection overhead</a> and <a href="objperf.nas">object access
+speed</a>.  Both are acceptable and within design goals: GC is about
+twice as fast as perl, object access about twice as slow.
+
+</body>
+</html>
